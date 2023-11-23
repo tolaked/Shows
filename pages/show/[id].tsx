@@ -1,59 +1,54 @@
 import { GetStaticProps, GetStaticPaths } from "next";
 
-import { Show } from "../../interfaces";
+import { Show, ShowSchema } from "../../interfaces";
 import { sampleUserData } from "../../utils/sample-data";
 import Layout from "../../components/Layout";
+import ShowInfo from "../../components/ShowInfo";
 import DetailsHeader from "../../components/DetailsHeader";
-import ShowDetails from "../../components/ShowDetails";
+import { useEffect, useState } from "react";
+import Cast from "../../components/Staring";
 
 type Props = {
   item?: Show;
   errors?: string;
 };
 
-const ShowPage = ({ item, errors }: Props) => {
-  // if (errors) {
-  //   return (
-  //     <Layout title="Error | Next.js + TypeScript Example">
-  //       <p>
-  //         <span style={{ color: "red" }}>Error:</span> {errors}
-  //       </p>
-  //     </Layout>
-  //   );
-  // }
+export const getServerSideProps = async ({ params }: any) => {
+  // Fetch data using the showId from params
+  // const showId = params?.showId;
+  console.log("SHOW ID", params);
+  const res = await fetch(
+    `https://api.tvmaze.com/shows/${params.id}?embed=cast`
+  );
+  const resJson = await res.json();
+  console.log("API CALL", { resJson });
+  // const show = ShowSchema.parse(resJson);
 
+  return {
+    props: {
+      params: {
+        showId: params.id,
+      },
+      show: resJson,
+    },
+  };
+};
+
+const ShowPage = ({ params, show }: any) => {
+  console.log({ params, show });
+
+  const cast = show._embedded?.cast.slice(0, 5);
   return (
-    <>
-      <DetailsHeader />
-      <ShowDetails />
-    </>
+    <div className="bg-black">
+      <DetailsHeader {...show} />
+      <main className="my-5 md:my-10 lg:mt-4 pb-20 lg:mb-20">
+        <div className="container grid lg:grid-cols-2 gap-10">
+          <ShowInfo {...show} />
+          {cast && cast.length > 0 && <Cast cast={cast} />}
+        </div>
+      </main>
+    </div>
   );
 };
 
 export default ShowPage;
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  // Get the paths we want to pre-render based on users
-  const paths = sampleUserData.map((show) => ({
-    params: { id: show.id.toString() },
-  }));
-
-  // We'll pre-render only these paths at build time.
-  // { fallback: false } means other routes should 404.
-  return { paths, fallback: false };
-};
-
-// This function gets called at build time on server-side.
-// It won't be called on client-side, so you can even do
-// direct database queries.
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  try {
-    const id = params?.id;
-    const item = sampleUserData.find((data) => data.id === Number(id));
-    // By returning { props: item }, the StaticPropsDetail component
-    // will receive `item` as a prop at build time
-    return { props: { item } };
-  } catch (err: any) {
-    return { props: { errors: err.message } };
-  }
-};

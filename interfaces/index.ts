@@ -1,11 +1,67 @@
-// You can include shared interfaces/types in a separate file
-// and then use them in any component by importing them. For
-// example, to import the interface below do:
-//
-// import { User } from 'path/to/interfaces';
 
-export type Show = {
-  id: number
-  name: string
-  title: string
-}
+
+// export type Show = {
+//   id: number
+//   name: string
+//   title: string
+//   rating: any
+// }
+
+
+import { z } from "zod";
+
+const ImageSchema = z
+    .object({
+        medium: z.string().nullable(),
+        original: z.string().nullable(),
+    })
+    .nullable();
+
+const PersonSchema = z.object({
+    person: z.object({
+        id: z.number(),
+        name: z.string(),
+        image: ImageSchema,
+    }),
+    character: z.object({
+        name: z.string(),
+    }),
+});
+
+export const ShowSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    summary: z.string().nullable(),
+    rating: z.object({
+        average: z.number().nullable(),
+    }),
+    image: ImageSchema,
+    genres: z.array(z.string()),
+    status: z.string(),
+    schedule: z.object({
+        time: z.string(),
+        days: z.array(z.string()),
+    }),
+    runtime: z.number().nullable(),
+    officialSite: z.string().nullable(),
+    network: z
+        .object({
+            name: z.string(),
+        })
+        .nullable(),
+    _embedded: z
+        .object({
+            cast: z.array(PersonSchema),
+        })
+        .optional(),
+});
+
+export const EpisodeSchema = z.object({
+    id: z.number(),
+    number: z.number().nullable(),
+    show: ShowSchema,
+});
+
+export type Show = z.infer<typeof ShowSchema>;
+export type Person = z.infer<typeof PersonSchema>;
+export type Episode = z.infer<typeof EpisodeSchema>;

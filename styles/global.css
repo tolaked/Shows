@@ -3,3 +3,8 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@layer utilities {
+    .container {
+        @apply px-4 md:px-8 max-w-screen-xl mx-auto;
+    }
+}
