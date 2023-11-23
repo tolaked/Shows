@@ -4,8 +4,6 @@ import Image from "next/image";
 import { Episode as ShowType } from "../interfaces";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
-
-import { Show } from "../interfaces";
 import { ratingScore, stars } from "../utils";
 
 const ListItem = ({ number, show: { id, name, rating, image } }: ShowType) => {
