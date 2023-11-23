@@ -18,7 +18,7 @@ const Character = ({ person, character }: Person) => {
         />
       </div>
       <p className="text-white">
-        {person.name} as <span className="text-red-800">{character.name}</span>
+        {person.name}: <span className="text-red-800">{character.name}</span>
       </p>
     </div>
   );
